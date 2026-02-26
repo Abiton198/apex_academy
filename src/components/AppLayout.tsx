@@ -11,206 +11,149 @@ import AdminDashboard from "./dashboards/AdminDashboard";
 import { Link } from "react-router-dom";
 
 // Icons & UI
-import { Info, ArrowRight, ExternalLink, Sparkles } from "lucide-react";
+import { Info, ArrowRight, MapPin, Sparkles, BookOpen, Globe } from "lucide-react";
 
 // Logos
-import logo from "../img/logo.png";
-import ZoomableImage from "@/lib/ZoomableImage";
-
-const logos = [
-  { src: logo, alt: "School Logo" },
- 
-];
+import logo from "../img/apex.png";
+// import ZoomableImage from "@/lib/ZoomableImage";
 
 const AppContent: React.FC = () => {
   const { user, loading } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
 
-  /* -------------------- LOADING -------------------- */
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-700 via-purple-700 to-indigo-900 text-white">
+      <div className="min-h-screen flex items-center justify-center bg-[#002b5c] text-white">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4" />
-          <p className="font-medium tracking-wide">Syncing School Portal...</p>
+          <p className="font-medium tracking-wide">Connecting to Apex Academy...</p>
         </div>
       </div>
     );
   }
 
-  /* -------------------- LANDING PAGE -------------------- */
   if (!user) {
     return (
-      <div className="relative min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-950 overflow-hidden">
-        {/* Background Image */}
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-30 scale-105"
-          style={{
-            backgroundImage:
-              "url(https://images.unsplash.com/photo-1523050854058-8df90110c9f1)",
-          }}
-        />
-        <div className="absolute inset-0 bg-black/40" />
+      <div className="relative min-h-screen bg-gradient-to-br from-[#001f3f] via-[#003366] to-[#001a33] overflow-hidden">
+        {/* Abstract "Apex" Background Elements */}
+        <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-indigo-600/10 rounded-full blur-3xl" />
 
-        {/* Top Logos Section (Uniform & Responsive) */}
-        <div className="absolute top-4 left-0 right-0 px-6 z-20">
-          <div className="hidden md:flex justify-between items-center max-w-7xl mx-auto">
-            {logos.map((item, index) => (
-              <div key={index} className="flex justify-center items-center w-40 h-20">
-                <ZoomableImage
-                  src={item.src}
-                  alt={item.alt}
-                  className="h-full w-full object-contain cursor-zoom-in transition-transform duration-300 hover:scale-110"
-                />
-              </div>
-            ))}
+        {/* Navigation / Logo Area */}
+        <nav className="relative z-20 flex justify-between items-center max-w-7xl mx-auto px-6 py-6">
+          <div className="flex items-center gap-3">
+             <div className="w-16 h-16 bg-white rounded-xl p-1 shadow-2xl">
+                <img src={logo} alt="Apex Logo" className="w-full h-full object-contain" />
+             </div>
+             <div>
+                <h2 className="text-white font-black text-xl leading-none">APEX</h2>
+                <p className="text-blue-400 text-[10px] tracking-[0.2em] font-bold uppercase">Academic College</p>
+             </div>
           </div>
+          <button 
+            onClick={() => setShowLoginModal(true)}
+            className="text-white bg-white/10 hover:bg-white/20 backdrop-blur-md px-6 py-2 rounded-full border border-white/20 text-sm font-semibold transition"
+          >
+            Portal Login
+          </button>
+        </nav>
 
-          <div className="md:hidden">
-            <div className="flex overflow-x-auto snap-x snap-mandatory no-scrollbar gap-4 items-center">
-              {logos.map((item, index) => (
-                <div key={index} className="min-w-full flex justify-center items-center snap-center py-2">
-                  <div className="w-48 h-24">
-                    <ZoomableImage src={item.src} alt={item.alt} className="h-full w-full object-contain" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-6 text-white pt-28">
+        {/* Main Hero Section */}
+        <div className="relative z-10 flex flex-col items-center justify-center pt-12 pb-24 px-6 text-center text-white">
           
           <motion.div 
             initial={{ opacity: 0, y: -20 }} 
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/20 text-yellow-300 text-sm mb-6"
+            className="inline-flex items-center gap-2 bg-blue-500/20 backdrop-blur-md px-5 py-2 rounded-full border border-blue-400/30 text-blue-200 text-xs font-bold uppercase tracking-widest mb-8"
           >
-            <Sparkles size={16} />
-            <span className="font-medium tracking-wide">Excellence in Christian Education</span>
+            <Globe size={14} className="text-blue-400" />
+            CAPS • IEB  • SACAI
           </motion.div>
 
-          <h1 className="text-4xl md:text-7xl font-extrabold mb-6 leading-tight tracking-tight">
-            Christian Academy <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-yellow-500">
-              Reformed Education
+          <motion.h1 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-5xl md:text-8xl font-black mb-4 tracking-tighter"
+          >
+            Bridging Gaps for <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-100 via-white to-blue-300">
+              Potential Discovery
             </span>
-          </h1>
+          </motion.h1>
 
-          <p className="text-lg md:text-xl max-w-3xl mb-10 text-blue-100 leading-relaxed font-light">
-            A <strong>premier hybrid academy</strong> offering British Curriculum International education. 
-            We blend world-class academic support with character-building 
-            instruction for ALL phases.
+          <h2 className="text-2xl md:text-4xl font-light text-blue-100/80 mb-10 italic">
+            2026 Matric Re-Write & Upgrading
+          </h2>
+
+          <p className="text-lg md:text-xl max-w-2xl mb-12 text-blue-100/60 leading-relaxed">
+            Choose an educated choice with <strong>Face-to-Face & Online classes</strong>. 
+            Offering full-time and part-time extra classes since 2017.
           </p>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-12">
-            <motion.button
-              whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(255,255,255,0.2)" }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setShowLoginModal(true)}
-              className="bg-white text-blue-900 font-bold py-4 px-10 rounded-full shadow-xl flex items-center justify-center gap-2"
-            >
-              Access Academy Portal <ArrowRight size={20} />
-            </motion.button>
-
-            <motion.a
-              href="/about"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-blue-600/30 backdrop-blur-md border border-white/30 text-white font-bold py-4 px-10 rounded-full flex items-center justify-center gap-2 hover:bg-blue-600/50 transition"
-            >
-              <Info size={20} /> Explore Our Academy
-            </motion.a>
-          </div>
-
-          {/* Highlights Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl text-left text-blue-50/80 mb-12">
+          {/* Core Service Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl w-full mb-16">
             {[
-              "British Curriculum-aligned Curriculum",
-              "Christian Core Values",
-              "Experienced Subject Specialists",
-              "Individualized Mentoring",
-              "Hybrid Learning Flexibility",
-              "Safe Learning Environment"
-            ].map((text, i) => (
-              <div key={i} className="flex items-center gap-2 bg-white/5 p-3 rounded-lg border border-white/10">
-                <div className="h-2 w-2 rounded-full bg-yellow-400" />
-                <span className="text-sm font-medium">{text}</span>
-              </div>
+              { title: "Matric Re-Write", desc: "For candidates looking to complete their NSC.", icon: <BookOpen className="text-blue-400" /> },
+              { title: "Matric Upgrading", desc: "Improve your existing results for university entry.", icon: <Sparkles className="text-blue-400" /> },
+              { title: "Extra Classes", desc: "Targeted subject support for all high school learners.", icon: <Info className="text-blue-400" /> }
+            ].map((card, i) => (
+              <motion.div 
+                key={i}
+                whileHover={{ y: -5 }}
+                className="bg-white/5 backdrop-blur-lg border border-white/10 p-8 rounded-3xl text-left hover:bg-white/10 transition"
+              >
+                <div className="mb-4">{card.icon}</div>
+                <h3 className="text-xl font-bold mb-2">{card.title}</h3>
+                <p className="text-sm text-blue-200/60">{card.desc}</p>
+              </motion.div>
             ))}
           </div>
 
-          {/* Attractive Secondary Discovery Link */}
-          <motion.a
-            href="/about"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1 }}
-            className="group flex items-center gap-3 text-yellow-300 hover:text-yellow-100 transition-all duration-300 bg-white/5 px-6 py-3 rounded-2xl border border-yellow-500/20"
-          >
-            <div className="bg-yellow-400 text-blue-900 p-1.5 rounded-full group-hover:rotate-12 transition-transform">
-              <ExternalLink size={14} />
-            </div>
-            <span className="text-sm font-bold uppercase tracking-widest">
-              Curious about our teaching model? Discover More
-            </span>
-          </motion.a>
-
-          {/* Main CTA */}
-          <motion.div
-            className="mt-16"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-          >
-            <motion.a
-              href="/enrol"
-              whileHover={{ scale: 1.05 }}
-              className="inline-block bg-gradient-to-r from-red-600 to-orange-500 px-10 py-5 rounded-2xl font-black text-white shadow-2xl tracking-wide uppercase text-sm"
+          {/* Action Area */}
+          <div className="flex flex-col sm:flex-row gap-6 items-center">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="bg-blue-600 hover:bg-blue-500 text-white font-black py-5 px-12 rounded-2xl shadow-2xl shadow-blue-900/50 flex items-center gap-3 text-lg"
             >
-              Enrolments Open – 2026 Academic Year
-            </motion.a>
-          </motion.div>
+              Apply for 2026 Intake <ArrowRight />
+            </motion.button>
+            <div className="text-left">
+                <p className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-1">Visit Our Campus</p>
+                <p className="text-sm text-white flex items-center gap-2">
+                    <MapPin size={14} /> Gqeberha (PE), Glendinningvale
+                </p>
+            </div>
+          </div>
         </div>
 
-        {/* Login Modal */}
+        {/* Intake Badges */}
+        <div className="flex justify-center gap-4 pb-20 px-6">
+            <span className="bg-rose-500/20 text-rose-300 border border-rose-500/30 px-4 py-2 rounded-lg text-[10px] font-bold uppercase">May - June Intake Open</span>
+            <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-4 py-2 rounded-lg text-[10px] font-bold uppercase">November Intake Open</span>
+        </div>
+
+        {/* Login Modal (Same Logic as before) */}
         <AnimatePresence>
           {showLoginModal && (
             <motion.div
-              className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
+              className="fixed inset-0 bg-[#001a33]/90 backdrop-blur-md flex items-center justify-center z-50 p-6"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
               <motion.div
-                initial={{ scale: 0.9, y: 20 }}
-                animate={{ scale: 1, y: 0 }}
-                exit={{ scale: 0.9, y: 20 }}
-                className="bg-white rounded-3xl shadow-2xl p-8 w-[95%] max-w-md relative overflow-hidden"
+                initial={{ scale: 0.95 }}
+                animate={{ scale: 1 }}
+                className="bg-white rounded-[2rem] shadow-2xl p-10 w-full max-w-md relative"
               >
-                <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-600 to-indigo-600" />
-                
-                <button
-                  onClick={() => setShowLoginModal(false)}
-                  className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition"
-                >
-                  ✕
-                </button>
-
-                <div className="text-center mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">Portal Access</h2>
-                  <p className="text-sm text-gray-500">Welcome back to Christian Academy</p>
+                <button onClick={() => setShowLoginModal(false)} className="absolute top-6 right-6 text-gray-400">✕</button>
+                <div className="text-center mb-8">
+                    <img src={logo} alt="Apex" className="w-16 mx-auto mb-4" />
+                    <h2 className="text-2xl font-black text-[#002b5c]">Student Portal</h2>
+                    <p className="text-gray-500 text-sm">Log in to access your dashboard</p>
                 </div>
-
                 <LoginForm />
-
-                <div className="mt-6 pt-6 border-t text-center">
-                  <a href="/about" className="text-xs font-bold text-blue-600 hover:underline flex items-center justify-center gap-1">
-                    New here? Learn about our vision <ExternalLink size={12} />
-                  </a>
-                </div>
               </motion.div>
             </motion.div>
           )}
@@ -219,7 +162,6 @@ const AppContent: React.FC = () => {
     );
   }
 
-  /* -------------------- DASHBOARDS -------------------- */
   switch (user.role) {
     case "parent": return <ParentDashboard />;
     case "teacher": return <TeacherDashboard />;
@@ -229,42 +171,23 @@ const AppContent: React.FC = () => {
   }
 };
 
-/* -------------------- APP LAYOUT -------------------- */
 const AppLayout: React.FC = () => {
   return (
     <AuthProvider>
-      <div className="min-h-screen flex flex-col font-sans antialiased">
+      <div className="min-h-screen flex flex-col font-sans antialiased bg-[#001a33]">
         <AppContent />
-      <footer className="bg-gray-950 text-white/40 py-10 border-t border-white/5">
-  <div className="max-w-7xl mx-auto px-6">
-    <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-      
-      {/* Copyright & Branding */}
-      <div className="text-[10px] tracking-widest uppercase">
-        © {new Date().getFullYear()} British Curriculum Hybrid Christian Academy 
-        <span className="mx-2 text-white/10">|</span> 
-        Excellence Reformed
-      </div>
-
-      {/* Compliance Links */}
-     <nav className="flex gap-8">
-  <Link 
-    to="/privacy-policy" 
-    className="text-[10px] tracking-widest uppercase hover:text-white transition-colors border-b border-transparent hover:border-white/20 pb-1"
-  >
-    Privacy Policy
-  </Link>
-  
-  <Link 
-    to="/delete-account-request" 
-    className="text-[10px] tracking-widest uppercase hover:text-rose-400 transition-colors border-b border-transparent hover:border-rose-400/20 pb-1"
-  >
-    Delete Account
-  </Link>
-</nav>
-    </div>
-  </div>
-</footer>
+        <footer className="bg-black/20 text-blue-200/40 py-12 border-t border-white/5 mt-auto">
+          <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+            <div className="text-center md:text-left">
+              <p className="text-xs font-bold uppercase tracking-widest text-blue-100/20 mb-2">Apex Academic College (PVT) LTD</p>
+              <p className="text-[10px]">Cnr Canynham & Lennox street, Glendinningvale Gqeberha</p>
+            </div>
+            <div className="flex gap-6 text-[10px] font-bold uppercase tracking-widest">
+                <Link to="/privacy-policy" className="hover:text-blue-400 transition">Privacy</Link>
+                <Link to="/delete-account-request" className="hover:text-rose-400 transition">Compliance</Link>
+            </div>
+          </div>
+        </footer>
       </div>
     </AuthProvider>
   );
