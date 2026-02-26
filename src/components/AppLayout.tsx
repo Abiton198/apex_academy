@@ -137,13 +137,15 @@ const AppContent: React.FC = () => {
 
           {/* Action Area */}
           <div className="flex flex-col sm:flex-row gap-6 items-center">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="bg-blue-600 hover:bg-blue-500 text-white font-black py-5 px-12 rounded-2xl shadow-2xl shadow-blue-900/50 flex items-center gap-3 text-lg"
-            >
-              Apply for 2026 Intake <ArrowRight />
-            </motion.button>
+           <Link to="/login" className="inline-block">
+  <motion.button
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
+    className="bg-blue-600 hover:bg-blue-500 text-white font-black py-5 px-12 rounded-2xl shadow-2xl shadow-blue-900/50 flex items-center gap-3 text-lg"
+  >
+    Apply for 2026 Intake <ArrowRight />
+  </motion.button>
+</Link>
             <div className="text-left">
                 <p className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-1">Visit Our Campus</p>
                 <p className="text-sm text-white flex items-center gap-2">

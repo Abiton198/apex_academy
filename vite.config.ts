@@ -13,9 +13,9 @@ export default defineConfig(({ mode }) => ({
     tailwindcss(), // 2. Add this to plugins
     react()
   ].filter(Boolean),
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
+resolve: {
+  alias: {
+    "@": path.resolve(__dirname, "./src"),
   },
+},
 }));

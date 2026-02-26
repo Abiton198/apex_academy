@@ -70,84 +70,60 @@ export default function LoginForm() {
   const [newTeacherUid, setNewTeacherUid] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
-  /* =====================================================
-   AUTH STATE LISTENER (WITH RETRY GUARD)
+ /* =====================================================
+   AUTH STATE LISTENER (FIXED PERMISSION GUARD)
    ===================================================== */
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (user) => {
-      if (!user || redirectedRef.current) {
-        setLoading(false);
-        return;
-      }
+useEffect(() => {
+  const unsub = onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
-      try {
-        const userRef = doc(db, "users", user.uid);
-        let snap = await getDoc(userRef);
+    // prevent double-execution if we are already showing the modal
+    if (showTeacherModal || redirectedRef.current) return;
 
-        // 🛡️ RETRY GUARD: If doc doesn't exist, wait for Firestore to catch up with Google Auth
-        if (!snap.exists()) {
-          console.log("Profile not found, retrying in 2 seconds...");
-          await new Promise((resolve) => setTimeout(resolve, 2000));
-          snap = await getDoc(userRef);
-        }
+    const userRef = doc(db, "users", user.uid);
+    
+    try {
+      const snap = await getDoc(userRef);
 
-        if (!snap.exists()) {
-          await auth.signOut();
-          setError("Account profile not found. Please register first.");
-          setLoading(false);
-          return;
-        }
-
+      if (snap.exists()) {
         const data = snap.data();
-        const role = data.role?.toLowerCase();
-
-        if (!role) {
-          await auth.signOut();
-          setError("Account role is missing. Contact support.");
-          setLoading(false);
-          return;
+        // ... Normal Redirect Logic ...
+      } else {
+        // NEW USER PATH
+        if (selectedRole === "teacher" || tab === "signup") {
+           // STOP: Don't sign out. Don't redirect. Just show modal.
+           setNewTeacherUid(user.uid);
+           setShowTeacherModal(true);
+           setLoading(false);
+        } else {
+           // If they aren't a teacher and have no profile, then they are lost
+           setError("Profile not found.");
+           setLoading(false);
         }
-
-        redirectedRef.current = true;
-
-        switch (role) {
-          case "principal":
-            window.location.href = "/principal-dashboard";
-            break;
-          case "teacher":
-            if (data.applicationStatus === "pending") {
-              setNewTeacherUid(user.uid);
-              setShowTeacherModal(true);
-              setLoading(false);
-              return;
-            }
-            window.location.href = "/teacher-dashboard";
-            break;
-          case "parent":
-            window.location.href = "/parent-dashboard";
-            break;
-          default:
-            await auth.signOut();
-            setError("Unauthorized role.");
-            setLoading(false);
-            break;
-        }
-      } catch (err) {
-        console.error("Auth redirect failed:", err);
+      }
+    } catch (err: any) {
+      // If it's a permission error, it's almost certainly a new user
+      if (err.code === "permission-denied" && selectedRole === "teacher") {
+        setNewTeacherUid(user.uid);
+        setShowTeacherModal(true);
         setLoading(false);
       }
-    });
+    }
+  });
 
-    return () => unsub();
-  }, []);
+  return () => unsub();
+}, [tab, selectedRole, showTeacherModal]); // Watch showTeacherModal to prevent loops
 
   /* =====================================================
      GOOGLE AUTH (SIGN IN & REGISTER)
      ===================================================== */
- const handleGoogle = async () => {
+const handleGoogle = async () => {
   if (authLoading) return;
 
-  // 1. Only require a role if we are definitely on the signup tab
+  // 1. Role requirement logic
   if (tab === "signup" && !selectedRole) {
     setError("Please select a role before continuing with Google");
     return;
@@ -164,31 +140,45 @@ export default function LoginForm() {
     const ref = doc(db, "users", user.uid);
     const snap = await getDoc(ref);
 
-    // 2. CHECK: If user exists, WE ARE DONE. 
-    // The useEffect at the top of your file will detect the login and redirect them.
+    // 2. Existing User Check
     if (snap.exists()) {
-      console.log("Existing user found. Role:", snap.data().role);
-      // We don't need to do anything else; the listener takes over.
+      const data = snap.data();
+      console.log("Existing user found. Role:", data.role);
+      
+      // Special check: If an existing teacher hasn't finished their application
+      if (data.role === "teacher" && data.applicationStatus === "pending") {
+        setNewTeacherUid(user.uid);
+        setShowTeacherModal(true);
+      }
       return; 
     }
 
-    // 3. ONLY if the user is BRAND NEW do we create the doc
-    // If they accidentally used the "SignIn" tab for a new account, 
-    // we default to "parent" as a safety net.
+    // 3. New User Creation
+    // Default to 'parent' if they used the Sign In tab for a first-time login
     const finalRole = selectedRole || "parent"; 
     
-    await setDoc(ref, {
+    const newUserProfile = {
       uid: user.uid,
       email: user.email,
       role: finalRole,
       applicationStatus: finalRole === "teacher" ? "pending" : "approved",
       createdAt: serverTimestamp(),
-    });
+    };
+
+    await setDoc(ref, newUserProfile);
+
+    // 4. Immediate Teacher Modal Trigger
+    // This bypasses the useEffect delay for a smoother registration UX
+    if (finalRole === "teacher") {
+      setNewTeacherUid(user.uid);
+      setShowTeacherModal(true);
+      setAuthLoading(false); // Stop loading so they can see the modal
+    }
 
   } catch (err: any) {
     console.error("Google Auth Error:", err);
     setError(err.message || "Google sign-in failed");
-    setAuthLoading(false); // Reset loading so they can try again
+    setAuthLoading(false); 
   }
 };
 
@@ -299,7 +289,7 @@ const handleStudentLogin = async () => {
             >
               <X size={20} />
             </button>
-            <CardTitle className="text-3xl font-bold">Care Academy</CardTitle>
+            <CardTitle className="text-3xl font-bold">APEX Academy</CardTitle>
             <CardDescription className="text-indigo-100">Portal Access</CardDescription>
           </CardHeader>
 
@@ -405,9 +395,22 @@ const handleStudentLogin = async () => {
             </Button>
           </CardContent>
         </Card>
+
+    
+
       </div>
 
-      <TeacherApplicationModal open={showTeacherModal} applicationId={newTeacherUid} onSubmitted={handleTeacherSubmitted} onClose={() => setShowTeacherModal(false)} />
+           {showTeacherModal && (
+      <TeacherApplicationModal 
+        open={showTeacherModal}
+        userId={newTeacherUid}
+        applicationId={newTeacherUid}
+        onClose={() => setShowTeacherModal(false)}
+        onSubmitted={() => {
+          setShowTeacherModal(false);
+          window.location.href = "/teacher-dashboard";
+        }}
+        />)}
     </>
   );
 }

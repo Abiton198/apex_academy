@@ -56,7 +56,7 @@ import {
 /* Auth & Signaling */
 import { useAuth } from "../auth/AuthProvider";
 import { Signaling } from "@/lib/signaling";
-import MoodleCard from "./MoodleCard";
+// import MoodleCard from "./MoodleCard";
 import { useParams } from "react-router-dom";
 
 
@@ -785,7 +785,7 @@ const sortedTimetable = [...timetable].sort((a, b) => {
 </header>
 
 
-       <MoodleCard/>
+       {/* <MoodleCard/> */}
 
       <main className="max-w-7xl mx-auto p-6 md:p-10">
 

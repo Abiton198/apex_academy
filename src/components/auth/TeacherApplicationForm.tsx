@@ -8,20 +8,16 @@ import {
   serverTimestamp,
   updateDoc,
   doc,
+  setDoc,
 } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useAuth } from "@/components/auth/AuthProvider";
 
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge"; // Ensure this is installed via shadcn
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -30,14 +26,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { X, GraduationCap, FileText, User, Loader2, CheckCircle2 } from "lucide-react";
+import { X, GraduationCap, FileText, Loader2, CheckCircle2, ShieldCheck, Briefcase, BookOpen } from "lucide-react";
 
 /* ======================================================
    TYPES & CONSTANTS
 ====================================================== */
+type CurriculumType = "CAPS" | "IEB" | "SACAI" | "British Curriculum";
+
 interface Subject {
   name: string;
-  curriculum: "British Curriculum";
+  curriculum: CurriculumType;
 }
 
 interface FormData {
@@ -45,7 +43,7 @@ interface FormData {
   lastName: string;
   email: string;
   yearsOfExperience: number;
-  gradePhase: "Primary" | "Secondary";
+  gradePhase: "Primary" | "Secondary" | "Matric Rewrite";
   subjects: Subject[];
 }
 
@@ -56,83 +54,50 @@ interface Documents {
 }
 
 interface TeacherApplicationFormProps {
-  applicationId?: string | null; // Used if editing an existing draft
-  onClose: () => void;           // Closes modal (triggers Sign Out in your Modal logic)
-  onSubmitted?: () => void;      // Triggers the transition to the Dashboard
+  applicationId?: string | null; 
+  onClose: () => void;           
+  onSubmitted?: () => void;      
+  userId?: string | null;
 }
 
-const British_Curriculum_SUBJECTS = [
-  /* =========================
-     Primary Curriculum
-     ========================= */
-  "English (Primary)",
-  "Mathematics (Primary)",
-  "Science (Primary)",
-  "Computing (Primary)",
-  "Geography (Primary)",
-  "History (Primary)",
-  "Art & Design (Primary)",
-  "Design & Technology (Primary)",
-  "Music (Primary)",
-  "Physical Education (Primary)",
-  "Religious Education (Primary)",
-  "PSHE (Primary)",
+const CURRICULA_OPTIONS: CurriculumType[] = ["CAPS", "IEB", "SACAI", "British Curriculum"];
 
-  /* =========================
-     IGCSE
-     ========================= */
-  "Mathematics (IGCSE)",
-  "Physics (IGCSE)",
-  "Chemistry (IGCSE)",
-  "Biology (IGCSE)",
-  "Computer Science (IGCSE)",
-  "English Language (IGCSE)",
-  "Business Studies (IGCSE)",
-  "Economics (IGCSE)",
-  "Geography (IGCSE)",
-  "History (IGCSE)",
-  "Coding (IGCSE)",
+const SUBJECT_DATABASE: Record<CurriculumType, string[]> = {
+  "CAPS": [
+    "Mathematics (FET)", "Mathematical Literacy (FET)", "Physical Sciences (FET)", 
+    "Life Sciences (FET)", "Accounting (FET)", "Business Studies (FET)", "Economics (FET)",
+    "English HL", "Afrikaans FAL", "isiZulu FAL", "Geography (FET)", "History (FET)"
+  ],
+  "IEB": [
+    "Mathematics (IEB)", "Physical Sciences (IEB)", "Life Sciences (IEB)", 
+    "Advanced Programme Mathematics", "Advanced Programme English", "Accounting (IEB)",
+    "English HL (IEB)", "Business Studies (IEB)", "Information Technology (IEB)"
+  ],
+  "SACAI": [
+    "Mathematics (SACAI)", "Mathematical Literacy (SACAI)", "Physical Sciences (SACAI)",
+    "Life Sciences (SACAI)", "Technical Mathematics", "Technical Sciences", "Tourism"
+  ],
+  "British Curriculum": [
+    "Mathematics (IGCSE/A-Level)", "Physics (IGCSE/A-Level)", "Chemistry (IGCSE/A-Level)",
+    "Biology (IGCSE/A-Level)", "English Language", "Computer Science", "Business Studies"
+  ]
+};
 
-  /* =========================
-     A-Level
-     ========================= */
-  "Mathematics (A-Level)",
-  "Further Mathematics (A-Level)",
-  "Physics (A-Level)",
-  "Chemistry (A-Level)",
-  "Biology (A-Level)",
-  "Computer Science (A-Level)",
-  "English Literature (A-Level)",
-  "Business Studies (A-Level)",
-  "Economics (A-Level)",
-  "Geography (A-Level)",
-  "History (A-Level)",
-
-
-  /*===========================
-      EXTRAS
-  ==============================*/
-  "Bible Study (All Grades)"
-];
-
-
-/* ======================================================
-   MAIN COMPONENT
-====================================================== */
 export default function TeacherApplicationForm({
   applicationId,
-  userId, // Destructure here
+  userId,
   onClose,
   onSubmitted,
 }: TeacherApplicationFormProps) {
   
-  const { user, loading: authLoading } = useAuth();
+  const { user } = useAuth();
+  const [selectedCurriculum, setSelectedCurriculum] = useState<CurriculumType>("CAPS");
   const [form, setForm] = useState<FormData>({
     firstName: "",
     lastName: "",
     email: user?.email || "",
     yearsOfExperience: 0,
-    gradePhase: "Primary",
+    gradePhase: "Secondary",
     subjects: [],
   });
 
@@ -141,7 +106,6 @@ export default function TeacherApplicationForm({
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
-  // Sync email from Auth if it changes
   useEffect(() => {
     if (user?.email) {
       setForm((prev) => ({ ...prev, email: user.email || "" }));
@@ -155,272 +119,186 @@ export default function TeacherApplicationForm({
     setDocuments((prev) => ({ ...prev, [key]: files }));
 
   const addSubject = (subjectName: string) => {
-    if (!form.subjects.some((s) => s.name === subjectName)) {
+    // Check if subject already exists to prevent duplicates
+    if (!form.subjects.some((s) => s.name === subjectName && s.curriculum === selectedCurriculum)) {
       setForm((prev) => ({
         ...prev,
-        subjects: [...prev.subjects, { name: subjectName, curriculum: "British Curriculum" }],
+        subjects: [...prev.subjects, { name: subjectName, curriculum: selectedCurriculum }],
       }));
     }
   };
 
-  const removeSubject = (name: string) => {
+  const removeSubject = (index: number) => {
     setForm((prev) => ({
       ...prev,
-      subjects: prev.subjects.filter((s) => s.name !== name),
+      subjects: prev.subjects.filter((_, i) => i !== index),
     }));
   };
 
-  /* ======================================================
-     SUBMISSION LOGIC (CORE FIX FOR FLICKERING)
-  ====================================================== */
- const handleSubmit = async (e?: React.FormEvent) => {
-  if (e) e.preventDefault();
-  
-  // 1. Determine the UID using the fallback prop
-  const activeUid = user?.uid || userId;
-  const activeEmail = user?.email || form.email; // Use form email as fallback
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const activeUid = userId || user?.uid;
+    if (!activeUid) { setError("Security session not found."); return; }
+    if (form.subjects.length === 0) { setError("Please select at least one subject."); return; }
 
-  if (!activeUid) {
-    setError("Session not detected. Please wait a moment and try again.");
-    return;
-  }
+    setError("");
+    setLoading(true);
 
-  if (form.subjects.length === 0) {
-    setError("Please select at least one British Curriculum subject.");
-    return;
-  }
+    try {
+      const applicationPayload = {
+        uid: activeUid,
+        email: user?.email || form.email,
+        personalInfo: { ...form },
+        status: "submitted",
+        updatedAt: serverTimestamp(),
+      };
 
-  setError("");
-  setLoading(true);
-
-  try {
-    const applicationPayload = {
-      uid: activeUid,
-      email: activeEmail,
-      personalInfo: { ...form, email: activeEmail, curriculum: "British Curriculum" },
-      subjects: form.subjects,
-      status: "pending",
-      updatedAt: serverTimestamp(),
-    };
-
-    // 2. Save/Update Application
-    let applicationIdToUse: string;
-    if (applicationId && applicationId !== activeUid) { 
-      // check if applicationId is a separate doc ID or the UID
-      const appRef = doc(db, "teacherApplications", applicationId);
-      await updateDoc(appRef, applicationPayload);
-      applicationIdToUse = applicationId;
-    } else {
       const appRef = await addDoc(collection(db, "teacherApplications"), {
         ...applicationPayload,
         createdAt: serverTimestamp(),
       });
-      applicationIdToUse = appRef.id;
-    }
 
-    // 3. Update User Status using activeUid
-    const userRef = doc(db, "users", activeUid);
-    await updateDoc(userRef, {
-      applicationStatus: "submitted", 
-      profileCompleted: true,
-      lastSubmissionId: applicationIdToUse,
-      updatedAt: serverTimestamp(),
-    });
+      const userRef = doc(db, "users", activeUid);
+      await setDoc(userRef, {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        applicationStatus: "submitted", 
+        profileCompleted: true,
+        lastApplicationId: appRef.id,
+        updatedAt: serverTimestamp(),
+      }, { merge: true });
 
-    // 4. File Uploads using activeUid
-    const uploadedDocs: Record<string, string[]> = {};
-    const docKeys = Object.keys(documents) as Array<keyof Documents>;
-
-    for (const key of docKeys) {
-      const fileList = documents[key];
-      if (!fileList || fileList.length === 0) continue;
-
-      uploadedDocs[key] = [];
-      for (const file of Array.from(fileList)) {
-        const fileRef = ref(storage, `teacherDocs/${activeUid}/${key}_${Date.now()}_${file.name}`);
-        
-        await new Promise<void>((resolve, reject) => {
-          const uploadTask = uploadBytesResumable(fileRef, file);
-          uploadTask.on("state_changed", null, reject, async () => {
-            const url = await getDownloadURL(uploadTask.snapshot.ref);
-            uploadedDocs[key].push(url);
-            resolve();
-          });
-        });
+      const uploadedDocs: Record<string, string> = {};
+      for (const [key, fileList] of Object.entries(documents)) {
+        if (fileList && fileList[0]) {
+          const file = fileList[0];
+          const fileRef = ref(storage, `teacherDocs/${activeUid}/${key}_${file.name}`);
+          const uploadTask = await uploadBytesResumable(fileRef, file);
+          const url = await getDownloadURL(uploadTask.ref);
+          uploadedDocs[key] = url;
+        }
       }
-    }
 
-    // 5. Update Application with File URLs
-    if (Object.keys(uploadedDocs).length > 0) {
-      const appDocRef = doc(db, "teacherApplications", applicationIdToUse);
-      await updateDoc(appDocRef, { documents: uploadedDocs });
-    }
-
-    setSuccess(true);
-    console.log("Submission successful!");
-
-    // 6. Trigger Navigation
-    setTimeout(() => {
-      if (onSubmitted) {
-        onSubmitted();
-      } else {
-        console.warn("onSubmitted prop is missing!");
-        onClose(); // Fallback
+      if (Object.keys(uploadedDocs).length > 0) {
+        await updateDoc(doc(db, "teacherApplications", appRef.id), { documentUrls: uploadedDocs });
       }
-    }, 2000);
 
-  } catch (err: any) {
-    console.error("Full Submission Error:", err);
-    setError(err.message || "Failed to submit application.");
-  } finally {
-    setLoading(false);
-  }
-};
+      setSuccess(true);
+      setTimeout(() => { if (onSubmitted) onSubmitted(); else onClose(); }, 2500);
+
+    } catch (err: any) {
+      setError("Application failed: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <Card className="w-full max-w-4xl max-h-[85vh] overflow-hidden flex flex-col bg-white shadow-2xl rounded-3xl border-0">
-      <CardHeader className="border-b bg-slate-50/50 p-6">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <div className="bg-indigo-600 p-2.5 rounded-xl text-white shadow-lg shadow-indigo-100">
-              <GraduationCap size={28} />
-            </div>
-            <div>
-              <CardTitle className="text-xl font-black text-slate-800 uppercase tracking-tight">
-                British Curriculum Academic Registry
-              </CardTitle>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Teacher Application</p>
-            </div>
-          </div>
-          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full hover:bg-rose-50 hover:text-rose-500 transition-colors">
-            <X size={20} />
-          </Button>
+    <div className="w-full flex flex-col bg-white">
+      {success ? (
+        <div className="flex flex-col items-center justify-center py-16 text-center animate-in fade-in zoom-in">
+          <CheckCircle2 size={60} className="text-blue-600 mb-4" />
+          <h3 className="text-2xl font-black text-[#002b5c]">Application Filed</h3>
+          <p className="text-slate-500 text-sm mt-2">Redirecting to Staff Portal...</p>
         </div>
-      </CardHeader>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}
 
-      <CardContent className="p-0 overflow-y-auto">
-        {success ? (
-          <div className="flex flex-col items-center justify-center py-20 px-8 text-center animate-in fade-in zoom-in duration-500">
-            <div className="w-24 h-24 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mb-6 shadow-inner">
-              <CheckCircle2 size={48} />
+          {/* IDENTITY */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label className="text-[10px] font-black uppercase text-slate-400">First Name</Label>
+              <Input className="h-11 rounded-xl bg-slate-50 border-none" value={form.firstName} onChange={(e) => handleChange("firstName", e.target.value)} required />
             </div>
-            <h3 className="text-3xl font-black text-slate-900">Application Filed</h3>
-            <p className="mt-4 text-slate-500 max-w-md mx-auto leading-relaxed">
-              Your British Curriculum teaching credentials have been securely transmitted. 
-              The Principal will review your status and subjects within 48 hours.
-            </p>
-            <Loader2 className="mt-8 animate-spin text-indigo-600" />
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mt-2">Redirecting to Staff Portal...</p>
+            <div className="space-y-1.5">
+              <Label className="text-[10px] font-black uppercase text-slate-400">Last Name</Label>
+              <Input className="h-11 rounded-xl bg-slate-50 border-none" value={form.lastName} onChange={(e) => handleChange("lastName", e.target.value)} required />
+            </div>
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="p-8 space-y-10">
-            {error && (
-              <Alert variant="destructive" className="rounded-2xl border-2">
-                <AlertDescription className="font-bold">{error}</AlertDescription>
-              </Alert>
-            )}
 
-            {/* SECTION: PERSONAL */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-4">
-                <h4 className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em] mb-4">01. Identity Profile</h4>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-bold text-slate-500 ml-1">First Name</Label>
-                      <Input className="rounded-xl border-slate-200" value={form.firstName} onChange={(e) => handleChange("firstName", e.target.value)} required />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-xs font-bold text-slate-500 ml-1">Last Name</Label>
-                      <Input className="rounded-xl border-slate-200" value={form.lastName} onChange={(e) => handleChange("lastName", e.target.value)} required />
-                    </div>
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label className="text-xs font-bold text-slate-500 ml-1">British Curriculum Teaching Experience (Years)</Label>
-                    <Input type="number" className="rounded-xl border-slate-200" value={form.yearsOfExperience || ""} onChange={(e) => handleChange("yearsOfExperience", parseInt(e.target.value) || 0)} required />
-                  </div>
-                </div>
+          {/* CURRICULUM & SUBJECT SELECTION */}
+          <div className="p-5 rounded-3xl bg-blue-50/50 border border-blue-100 space-y-4">
+            <div className="flex items-center gap-2 text-blue-700 mb-2">
+              <BookOpen size={18} />
+              <h4 className="text-xs font-black uppercase tracking-widest">Academic Specialization</h4>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-black text-blue-600 uppercase">1. Select Curriculum</Label>
+                <Select value={selectedCurriculum} onValueChange={(v: any) => setSelectedCurriculum(v)}>
+                  <SelectTrigger className="bg-white rounded-xl border-blue-100"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {CURRICULA_OPTIONS.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                  </SelectContent>
+                </Select>
               </div>
 
-              {/* SECTION: ACADEMIC */}
-              <div className="space-y-4">
-                <h4 className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em] mb-4">02. Academic Focus</h4>
-                <div className="space-y-4">
-                  <div className="space-y-1.5">
-                    <Label className="text-xs font-bold text-slate-500 ml-1">Grade Phase</Label>
-                    <Select value={form.gradePhase} onValueChange={(v: any) => handleChange("gradePhase", v)}>
-                      <SelectTrigger className="rounded-xl border-slate-200"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Primary">Primary (Checkpoint)</SelectItem>
-                        <SelectItem value="Secondary">Secondary (IGCSE / A-Level)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label className="text-xs font-bold text-slate-500 ml-1">Add British Curriculum Subjects</Label>
-                    <Select onValueChange={addSubject}>
-                      <SelectTrigger className="rounded-xl border-slate-200"><SelectValue placeholder="Search subjects..." /></SelectTrigger>
-                      <SelectContent>
-                        {British_Curriculum_SUBJECTS.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-black text-blue-600 uppercase">2. Add Subjects</Label>
+                <Select onValueChange={addSubject}>
+                  <SelectTrigger className="bg-white rounded-xl border-blue-100"><SelectValue placeholder="Choose subject..." /></SelectTrigger>
+                  <SelectContent>
+                    {SUBJECT_DATABASE[selectedCurriculum].map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
-            {/* SUBJECT CHIPS */}
-            {form.subjects.length > 0 && (
-              <div className="bg-slate-50 p-4 rounded-2xl border-2 border-dashed border-slate-200">
-                <div className="flex flex-wrap gap-2">
-                  {form.subjects.map(s => (
-                    <Badge key={s.name} className="bg-white text-slate-700 border-slate-200 hover:bg-rose-50 hover:text-rose-500 hover:border-rose-100 transition-all px-3 py-1.5 rounded-lg flex items-center gap-2 cursor-default">
-                      {s.name}
-                      <X size={12} className="cursor-pointer" onClick={() => removeSubject(s.name)} />
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* SECTION: DOCS */}
-            <div className="space-y-4">
-              <h4 className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em]">03. Required Documentation (PDF/JPG)</h4>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <DocInput label="Qualifications" onChange={(f) => handleFileChange("qualification", f)} />
-                <DocInput label="Professional CV" onChange={(f) => handleFileChange("cv", f)} />
-                <DocInput label="Identity Document" onChange={(f) => handleFileChange("idDoc", f)} />
-              </div>
+            {/* CHIPS DISPLAY */}
+            <div className="flex flex-wrap gap-2 pt-2">
+              {form.subjects.map((s, index) => (
+                <Badge key={`${s.name}-${index}`} className="bg-white text-blue-700 border-blue-200 px-3 py-1 rounded-lg gap-2 shadow-sm">
+                  <span className="text-[9px] font-black opacity-50">{s.curriculum}:</span> {s.name}
+                  <X size={12} className="cursor-pointer hover:text-red-500" onClick={() => removeSubject(index)} />
+                </Badge>
+              ))}
+              {form.subjects.length === 0 && <p className="text-[10px] text-slate-400 italic">No subjects added yet.</p>}
             </div>
+          </div>
 
-            {/* FOOTER ACTIONS */}
-            <div className="flex gap-4 pt-6 border-t border-slate-100">
-              <Button type="submit" disabled={loading} className="flex-[2] h-14 rounded-2xl bg-indigo-600 hover:bg-indigo-700 font-black text-sm tracking-widest shadow-xl shadow-indigo-100">
-                {loading ? <Loader2 className="animate-spin" /> : "FINALIZE APPLICATION"}
-              </Button>
-              <Button type="button" variant="outline" onClick={onClose} className="flex-1 h-14 rounded-2xl font-black text-xs tracking-widest text-slate-400 border-2">
-                SAVE DRAFT
-              </Button>
+          {/* EXPERIENCE & PHASE */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label className="text-[10px] font-black uppercase text-slate-400">Experience (Years)</Label>
+              <Input type="number" className="h-11 rounded-xl bg-slate-50 border-none" value={form.yearsOfExperience || ""} onChange={(e) => handleChange("yearsOfExperience", parseInt(e.target.value) || 0)} />
             </div>
-          </form>
-        )}
-      </CardContent>
-    </Card>
+            <div className="space-y-1.5">
+              <Label className="text-[10px] font-black uppercase text-slate-400">Grade Phase</Label>
+              <Select value={form.gradePhase} onValueChange={(v: any) => handleChange("gradePhase", v)}>
+                <SelectTrigger className="h-11 rounded-xl bg-slate-50 border-none"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Secondary">High School (FET)</SelectItem>
+                  <SelectItem value="Matric Rewrite">Matric Rewrite Expert</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* UPLOADS */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <DocInput label="CV" onChange={(f) => handleFileChange("cv", f)} />
+            <DocInput label="Qualifications" onChange={(f) => handleFileChange("qualification", f)} />
+            <DocInput label="ID / Passport" onChange={(f) => handleFileChange("idDoc", f)} />
+          </div>
+
+          <Button type="submit" disabled={loading} className="w-full h-14 rounded-2xl bg-[#002b5c] hover:bg-blue-600 text-white font-black tracking-widest shadow-xl">
+            {loading ? <Loader2 className="animate-spin" /> : "SUBMIT APPLICATION"}
+          </Button>
+        </form>
+      )}
+    </div>
   );
 }
 
-/* Sub-component for File Inputs */
 function DocInput({ label, onChange }: { label: string; onChange: (f: FileList | null) => void }) {
   return (
     <div className="space-y-1.5">
-      <Label className="text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-tight">{label}</Label>
+      <Label className="text-[9px] font-black uppercase text-slate-400 ml-1">{label}</Label>
       <div className="relative group">
-        <Input 
-          type="file" 
-          className="rounded-xl border-slate-200 text-[10px] h-12 pt-3.5 group-hover:border-indigo-300 transition-colors" 
-          onChange={(e) => onChange(e.target.files)} 
-        />
-        <FileText size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300" />
+        <Input type="file" accept=".pdf" className="rounded-xl bg-slate-50 border-none text-[10px] h-11 pt-4 file:hidden cursor-pointer" onChange={(e) => onChange(e.target.files)} />
+        <FileText size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" />
       </div>
     </div>
   );
