@@ -1,180 +1,201 @@
 "use client";
 
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { 
   Globe, 
   MapPin, 
   MessageSquare, 
   LayoutDashboard, 
-  Heart, 
   Zap, 
   MousePointerClick,
   ShieldCheck,
-  RefreshCcw
+  RefreshCcw,
+  Video,
+  ChevronLeft,
+  X,
+  Smartphone
 } from "lucide-react";
 
 const LearningPlatform: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 px-6 py-12">
-      <div className="max-w-6xl mx-auto space-y-16">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 px-4 py-8 md:px-6 md:py-12 relative overflow-hidden">
+      
+      {/* Navigation Header */}
+      <div className="max-w-6xl mx-auto flex justify-between items-center mb-12">
+        <button
+          onClick={() => navigate(-1)}
+          className="group flex items-center gap-2 bg-white/90 backdrop-blur-md px-4 py-2 rounded-2xl shadow-sm border border-blue-100 text-[#002b5c] hover:bg-[#002b5c] hover:text-white transition-all"
+        >
+          <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+          <span className="font-bold text-sm">Back</span>
+        </button>
+        <Link
+          to="/"
+          className="p-2 bg-white/90 rounded-full shadow-sm border border-blue-100 text-slate-400 hover:text-rose-500 transition-all"
+        >
+          <X size={24} />
+        </Link>
+      </div>
+
+      <div className="max-w-6xl mx-auto space-y-16 relative z-10">
         
         {/* Hero Section */}
         <div className="text-center space-y-6">
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="inline-flex items-center gap-2 bg-purple-100 text-purple-700 px-5 py-2 rounded-full text-sm font-bold tracking-wide"
+            className="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em]"
           >
-            <Zap size={16} className="fill-purple-700" />
-            Modern Hybrid Learning for 2026
+            <Zap size={14} className="fill-white" />
+            Hybrid Education 2.0
           </motion.div>
-          <h1 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-900 to-purple-700 leading-tight">
-            One Academy. <br className="hidden md:block" /> 
-            Two Ways to Learn.
+          <h1 className="text-4xl md:text-7xl font-black text-[#002b5c] tracking-tighter leading-tight">
+            One College. <br className="hidden md:block" /> 
+            Two Ways to <span className="text-blue-600">Succeed.</span>
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Care Academy Grade 1 – 12: A nurturing <strong>Christian environment</strong> offering 
-            both <strong>British Curriculum</strong> pathways through a seamless digital ecosystem.
+          <p className="text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
+            Apex Academic College offers a seamless digital ecosystem for <strong>Matric Re-writes</strong>. 
+            Whether you attend our Gqeberha campus or join us online, you receive the same elite tuition.
           </p>
         </div>
 
         {/* The Hybrid Freedom Section */}
-        <div className="bg-white rounded-[3rem] shadow-2xl p-8 md:p-12 border border-purple-50 relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-8 opacity-5">
-            <Globe size={200} />
+        <div className="bg-white rounded-[3rem] shadow-2xl p-8 md:p-16 border border-blue-50 relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-8 opacity-5 text-blue-900">
+            <Globe size={300} />
           </div>
           
           <div className="relative z-10 grid md:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <h2 className="text-3xl font-bold text-gray-900">Education without Borders</h2>
-              <p className="text-gray-600 leading-relaxed">
-                Whether you are traveling, relocating, or simply prefer the comfort of home, 
-                our platform ensures <strong>academic continuity</strong>. Students have the 
-                unique opportunity to choose their mode of learning <strong>every term</strong>.
-              </p>
+            <div className="space-y-8">
+              <div className="space-y-4">
+                <h2 className="text-3xl font-black text-[#002b5c]">Freedom of Choice</h2>
+                <p className="text-slate-500 leading-relaxed text-sm md:text-base">
+                  Relocating or working full-time? Our platform ensures <strong>academic continuity</strong>. 
+                  Switch between our physical campus and virtual classroom seamlessly whenever your circumstances change.
+                </p>
+              </div>
               
               <div className="space-y-4">
-                <div className="flex items-center gap-4 p-4 bg-indigo-50 rounded-2xl border border-indigo-100">
-                  <div className="bg-indigo-600 text-white p-2 rounded-lg"><MapPin size={24}/></div>
+                <div className="flex items-center gap-4 p-5 bg-slate-50 rounded-3xl border border-slate-100 group hover:border-blue-400 transition-all">
+                  <div className="bg-[#002b5c] text-white p-3 rounded-2xl"><MapPin size={24}/></div>
                   <div>
-                    <h4 className="font-bold text-indigo-900">Physical Campus</h4>
-                    <p className="text-xs text-indigo-700">In-person mentorship & social interaction</p>
+                    <h4 className="font-black text-[#002b5c]">Gqeberha Campus</h4>
+                    <p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Glendinningvale Premises</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 p-4 bg-purple-50 rounded-2xl border border-purple-100">
-                  <div className="bg-purple-600 text-white p-2 rounded-lg"><Globe size={24}/></div>
+                <div className="flex items-center gap-4 p-5 bg-blue-50/50 rounded-3xl border border-blue-100 group hover:border-blue-400 transition-all">
+                  <div className="bg-blue-600 text-white p-3 rounded-2xl"><Globe size={24}/></div>
                   <div>
-                    <h4 className="font-bold text-purple-900">Virtual Classroom</h4>
-                    <p className="text-xs text-purple-700">Learn from anywhere in the world</p>
+                    <h4 className="font-black text-[#002b5c]">Virtual Classroom</h4>
+                    <p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Interactive Online Portal</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-[2rem] p-8 text-white space-y-6 shadow-xl">
-              <div className="flex items-center gap-2 text-yellow-300 font-bold uppercase tracking-widest text-xs">
-                <RefreshCcw size={16} /> Termly Flexibility
+            <div className="bg-[#002b5c] rounded-[2.5rem] p-10 text-white space-y-6 shadow-2xl border-b-8 border-blue-500">
+              <div className="flex items-center gap-2 text-blue-400 font-black uppercase tracking-widest text-[10px]">
+                <RefreshCcw size={16} /> Total Mobility
               </div>
               <h3 className="text-2xl font-bold italic text-white leading-snug">
-                "Relocating mid-year? No problem. Simply switch to Virtual and keep your teachers, 
-                your curriculum, and your friends."
+                "Working a part-time job? Catch the live evening sessions or watch the recordings on your lunch break. 
+                Your matric, your schedule."
               </h3>
-              <div className="flex items-center gap-3 pt-4 border-t border-white/20">
-                <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
-                  <Heart className="fill-white" size={20} />
+              <div className="flex items-center gap-3 pt-6 border-t border-white/10">
+                <div className="h-12 w-12 rounded-2xl bg-blue-500/20 flex items-center justify-center">
+                  <Smartphone className="text-blue-400" size={24} />
                 </div>
-                <p className="text-sm font-medium">Nurturing Excellence in a Christian Environment</p>
+                <p className="text-xs font-bold uppercase tracking-tighter opacity-70">Mobile-Optimized Learning App</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* The Digital Core (LMS) */}
-        <div className="space-y-10">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900">Powerful, Simple, Integrated</h2>
-            <p className="text-gray-500">Everything you need in one seamless portal.</p>
+        <div className="space-y-12">
+          <div className="text-center space-y-2">
+            <h2 className="text-3xl font-black text-[#002b5c]">The Apex Digital Advantage</h2>
+            <p className="text-slate-400 font-bold uppercase tracking-[0.2em] text-[10px]">One-Click Access to Excellence</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Dashboard Card 1 */}
-            <motion.div whileHover={{ y: -10 }} className="bg-white p-8 rounded-[2rem] shadow-xl border-t-4 border-blue-500">
-              <LayoutDashboard size={40} className="text-blue-500 mb-6" />
-              <h3 className="text-xl font-bold text-gray-800 mb-3">Seamless Portal</h3>
-              <p className="text-sm text-gray-600 leading-relaxed mb-4">
-                A modern LMS designed for ease of use. No complicated menus—just one-click 
-                access to live lessons, recorded archives, and study resources.
+            {/* Live Streaming */}
+            <motion.div whileHover={{ y: -10 }} className="bg-white p-8 rounded-[2.5rem] shadow-xl border-b-4 border-blue-500">
+              <Video size={40} className="text-blue-500 mb-6" />
+              <h3 className="text-xl font-black text-[#002b5c] mb-3">Live Streaming</h3>
+              <p className="text-xs text-slate-500 leading-relaxed mb-6">
+                Don't just watch videos—participate. Our live classes allow you to ask questions 
+                in real-time, just like being in a physical classroom.
               </p>
-              <ul className="text-xs space-y-2 text-gray-500 font-medium">
-                <li className="flex items-center gap-2"><ShieldCheck size={14} className="text-green-500"/> Single Sign-On Access</li>
-                <li className="flex items-center gap-2"><ShieldCheck size={14} className="text-green-500"/> Personalized Timetables</li>
-              </ul>
+              <div className="flex items-center gap-2 text-[10px] font-black text-blue-600 uppercase">
+                <ShieldCheck size={14} /> HD Quality Video
+              </div>
             </motion.div>
 
-            {/* Dashboard Card 2 */}
-            <motion.div whileHover={{ y: -10 }} className="bg-white p-8 rounded-[2rem] shadow-xl border-t-4 border-purple-500">
-              <MessageSquare size={40} className="text-purple-500 mb-6" />
-              <h3 className="text-xl font-bold text-gray-800 mb-3">In-App Communication</h3>
-              <p className="text-sm text-gray-600 leading-relaxed mb-4">
-                Built-in chat connects students directly with subject specialists. Get instant 
-                help and stay engaged through our collaborative community forums.
+            {/* In-App Communication */}
+            <motion.div whileHover={{ y: -10 }} className="bg-white p-8 rounded-[2.5rem] shadow-xl border-b-4 border-slate-900">
+              <MessageSquare size={40} className="text-slate-900 mb-6" />
+              <h3 className="text-xl font-black text-[#002b5c] mb-3">Tutor Support</h3>
+              <p className="text-xs text-slate-500 leading-relaxed mb-6">
+                Direct access to subject specialists via our integrated chat. Stuck on a 
+                maths problem at 8 PM? Drop a message in the subject forum.
               </p>
-              <ul className="text-xs space-y-2 text-gray-500 font-medium">
-                <li className="flex items-center gap-2"><ShieldCheck size={14} className="text-green-500"/> Direct Teacher Chat</li>
-                <li className="flex items-center gap-2"><ShieldCheck size={14} className="text-green-500"/> Peer Study Groups</li>
-              </ul>
+              <div className="flex items-center gap-2 text-[10px] font-black text-slate-900 uppercase">
+                <ShieldCheck size={14} /> Direct Student-Teacher Chat
+              </div>
             </motion.div>
 
-            {/* Dashboard Card 3 */}
-            <motion.div whileHover={{ y: -10 }} className="bg-white p-8 rounded-[2rem] shadow-xl border-t-4 border-orange-500">
-              <MousePointerClick size={40} className="text-orange-500 mb-6" />
-              <h3 className="text-xl font-bold text-gray-800 mb-3">Smart Dashboards</h3>
-              <p className="text-sm text-gray-600 leading-relaxed mb-4">
-                Real-time tracking for parents and students. Monitor grades, attendance, 
-                and spiritual growth goals through a visually intuitive interface.
+            {/* Smart Dashboards */}
+            <motion.div whileHover={{ y: -10 }} className="bg-white p-8 rounded-[2.5rem] shadow-xl border-b-4 border-blue-300">
+              <LayoutDashboard size={40} className="text-blue-400 mb-6" />
+              <h3 className="text-xl font-black text-[#002b5c] mb-3">Result Tracking</h3>
+              <p className="text-xs text-slate-500 leading-relaxed mb-6">
+                Visual dashboards for tracking your mock exam progress. Identify your weak 
+                spots before the final NSC examinations begin.
               </p>
-              <ul className="text-xs space-y-2 text-gray-500 font-medium">
-                <li className="flex items-center gap-2"><ShieldCheck size={14} className="text-green-500"/> Real-time Gradebook</li>
-                <li className="flex items-center gap-2"><ShieldCheck size={14} className="text-green-500"/> Attendance Insights</li>
-              </ul>
+              <div className="flex items-center gap-2 text-[10px] font-black text-blue-400 uppercase">
+                <ShieldCheck size={14} /> Live Gradebook
+              </div>
             </motion.div>
           </div>
         </div>
 
+        {/* Mobile Platform Concept Diagram Placeholders */}
+        <div className="py-8">
+          
+        </div>
+
         {/* Final Registration CTA */}
-        <div className="text-center py-12">
-          <div className="bg-indigo-900 rounded-[3rem] p-10 md:p-16 text-white shadow-2xl relative overflow-hidden">
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/20 rounded-full -ml-32 -mb-32 blur-3xl"></div>
+        <div className="text-center">
+          <div className="bg-[#002b5c] rounded-[3rem] p-10 md:p-16 text-white shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-600/20 to-transparent"></div>
             
             <h2 className="text-3xl md:text-5xl font-black mb-6 relative z-10">
-              Registrations Always Open
+              Registration for 2026 Open
             </h2>
-            <p className="text-indigo-100 text-lg max-w-2xl mx-auto mb-10 relative z-10">
-              Secure your child's place in our 2026 intake. Choose between 
-              <strong> British Curriculum</strong>and start your hybrid 
-              educational journey on <strong>26 January 2026</strong>.
+            <p className="text-blue-100/70 text-lg max-w-2xl mx-auto mb-10 relative z-10 font-light">
+              Secure your place for the 2026 intake. Classes started <strong>21 January 2026</strong>. 
+              Join the future of matric upgrading today.
             </p>
             
             <Link
               to="/login"
-              className="inline-flex items-center gap-3 bg-yellow-400 text-indigo-950 font-black text-xl px-12 py-5 rounded-2xl hover:bg-white hover:scale-105 transition-all duration-300 shadow-xl relative z-10"
+              className="inline-flex items-center gap-3 bg-blue-500 text-white font-black text-xl px-12 py-5 rounded-2xl hover:bg-white hover:text-[#002b5c] transition-all duration-300 shadow-xl relative z-10"
             >
-              Enrol Your Child Today <Zap size={20} className="fill-indigo-950" />
+              Start Your Online Application <Zap size={20} className="fill-current" />
             </Link>
-            
-            <p className="mt-8 text-indigo-300 text-sm italic relative z-10">
-              Easy navigation. Seamless onboarding. Nurturing character.
-            </p>
           </div>
         </div>
 
         {/* Back Link */}
-        <div className="text-center">
+        <div className="text-center pb-8">
           <Link
             to="/about"
-            className="text-gray-400 font-bold hover:text-indigo-600 transition underline decoration-2 underline-offset-4"
+            className="text-slate-400 font-bold hover:text-blue-600 transition underline decoration-2 underline-offset-4"
           >
             ← Back to About Us
           </Link>

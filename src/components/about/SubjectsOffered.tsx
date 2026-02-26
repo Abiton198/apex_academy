@@ -1,48 +1,74 @@
 "use client";
 
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { 
   BookOpen, 
   Atom, 
-  Palette, 
   TrendingUp, 
-  Globe, 
-  Heart, 
   Award,
-  CheckCircle
+  CheckCircle2,
+  ChevronLeft,
+  X,
+  Languages,
+  Calculator,
+  Microscope,
+  Briefcase
 } from "lucide-react";
 
 const SubjectsOffered: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-blue-100 px-6 py-12">
-      <div className="max-w-6xl mx-auto space-y-16">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-100 px-4 py-8 md:px-6 md:py-12 relative">
+      
+      {/* Navigation Header */}
+      <div className="max-w-6xl mx-auto flex justify-between items-center mb-8 md:mb-16">
+        <button
+          onClick={() => navigate(-1)}
+          className="group flex items-center gap-2 bg-white/90 backdrop-blur-md px-4 py-2 rounded-2xl shadow-sm border border-blue-100 text-[#002b5c] hover:bg-[#002b5c] hover:text-white transition-all"
+        >
+          <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+          <span className="font-bold text-sm">Back</span>
+        </button>
+        <Link
+          to="/"
+          className="p-2 bg-white/90 rounded-full shadow-sm border border-blue-100 text-slate-400 hover:text-rose-500 transition-all"
+        >
+          <X size={24} />
+        </Link>
+      </div>
+
+      <div className="max-w-6xl mx-auto space-y-12 md:space-y-16">
         
         {/* Hero Banner */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-indigo-900 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl text-center"
+          className="bg-[#002b5c] rounded-[2.5rem] md:rounded-[3.5rem] p-8 md:p-16 text-white shadow-2xl text-center relative overflow-hidden border-b-8 border-blue-500"
         >
-          <div className="space-y-4">
-            <span className="bg-emerald-500 px-4 py-1 rounded-full text-xs font-black tracking-widest">
-              British Curriculum International
+          <div className="absolute top-0 right-0 p-8 opacity-10">
+            <BookOpen size={200} />
+          </div>
+          <div className="relative z-10 space-y-6">
+            <span className="bg-blue-500 px-4 py-1 rounded-full text-[10px] font-black tracking-[0.3em] uppercase">
+              CAPS • IEB • SACAI Support
             </span>
-            <h2 className="text-3xl md:text-5xl font-black leading-tight">
-              All levels <br />
-              <span className="text-yellow-300">British Curriculum Pathway</span>
+            <h2 className="text-4xl md:text-6xl font-black leading-tight tracking-tighter">
+              Expert Tuition for <br />
+              <span className="text-blue-400 font-serif italic">Matric Excellence</span>
             </h2>
-            <p className="text-lg text-indigo-100 max-w-3xl mx-auto">
-              British Curriculum Primary, Lower Secondary, IGCSE and AS/A Levels —  
-              delivered through our world-class hybrid learning platform.
+            <p className="text-lg text-blue-100/80 max-w-2xl mx-auto font-light">
+              Strategic subject support designed to help you upgrade your symbols and 
+              secure your spot at NMU, UCT, or any leading university.
             </p>
             <div className="pt-4">
               <Link
-                to="/login"
-                className="inline-block bg-white text-indigo-900 font-black px-10 py-4 rounded-2xl hover:bg-yellow-300 transition shadow-xl"
+                to="/about/fees"
+                className="inline-flex items-center gap-2 bg-white text-[#002b5c] font-black px-10 py-5 rounded-2xl hover:bg-blue-400 hover:text-white transition-all shadow-xl transform hover:scale-105"
               >
-                Register Online Today
+                View Fee Structure <TrendingUp size={18} />
               </Link>
             </div>
           </div>
@@ -50,157 +76,107 @@ const SubjectsOffered: React.FC = () => {
 
         {/* Introduction */}
         <div className="text-center space-y-4">
-          <h1 className="text-4xl md:text-6xl font-black text-gray-900">
-            British Curriculum Subjects Offered
+          <h1 className="text-3xl md:text-5xl font-black text-[#002b5c] tracking-tight">
+            High-Impact Subjects Offered
           </h1>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            A structured international curriculum designed for academic excellence,
-            global mobility and university readiness.
+          <p className="text-slate-500 max-w-2xl mx-auto text-sm md:text-base">
+            We focus on the gateway subjects that hold the most weight for university points (APS). 
+            Available through both our Gqeberha campus and our Virtual platform.
           </p>
         </div>
 
-        {/* Primary (British Curriculum Primary 1–7) */}
-        <div className="bg-white rounded-[3rem] p-8 md:p-12 shadow-xl border border-emerald-100">
-          <div className="flex flex-col md:flex-row gap-10 items-center">
-            <div className="flex-1 space-y-6">
-              <div className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 px-4 py-1 rounded-full font-bold text-sm">
-                <Heart size={16} /> British Curriculum Primary
-              </div>
-              <h2 className="text-3xl font-bold text-gray-800">
-                Strong Academic Foundations
-              </h2>
-              <p className="text-gray-600">
-                British Curriculum Primary builds confidence in core skills while developing
-                curiosity, creativity and independent thinking.
-              </p>
-              <div className="grid grid-cols-2 gap-4">
-                {[
-                  "English",
-                  "Mathematics",
-                  "Science",
-                  "Global Perspectives",
-                  "ICT Skills",
-                  "Wellbeing & Life Skills"
-                ].map((sub, i) => (
-                  <div key={i} className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                    <CheckCircle size={14} className="text-emerald-500" /> {sub}
-                  </div>
-                ))}
-              </div>
+        {/* The Core 4 Pillars */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          
+          {/* STEM Pillar */}
+          <motion.div whileHover={{ y: -10 }} className="p-8 bg-white rounded-[2.5rem] shadow-xl border-t-8 border-blue-600">
+            <div className="bg-blue-50 w-14 h-14 rounded-2xl flex items-center justify-center text-blue-600 mb-6">
+              <Microscope size={28} />
             </div>
-            <div className="w-full md:w-1/3 bg-emerald-50 p-6 rounded-3xl border-2 border-dashed border-emerald-200 text-center">
-              <BookOpen size={48} className="mx-auto text-emerald-600 mb-4" />
-              <h4 className="font-bold text-emerald-900">Grades 1 – 7</h4>
-              <p className="text-xs text-emerald-700 mt-2 italic">
-                British Curriculum Primary Programme
-              </p>
+            <h3 className="text-xl font-black text-[#002b5c] mb-4">Sciences</h3>
+            <ul className="space-y-3 text-sm text-slate-500 font-bold">
+                <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-blue-500"/> Mathematics</li>
+                <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-blue-500"/> Physical Sciences</li>
+                <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-blue-500"/> Life Sciences</li>
+                <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-blue-500"/> Technical Sciences</li>
+            </ul>
+          </motion.div>
+
+          {/* Commerce Pillar */}
+          <motion.div whileHover={{ y: -10 }} className="p-8 bg-white rounded-[2.5rem] shadow-xl border-t-8 border-emerald-500">
+            <div className="bg-emerald-50 w-14 h-14 rounded-2xl flex items-center justify-center text-emerald-600 mb-6">
+              <Briefcase size={28} />
             </div>
-          </div>
+            <h3 className="text-xl font-black text-[#002b5c] mb-4">Commerce</h3>
+            <ul className="space-y-3 text-sm text-slate-500 font-bold">
+                <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-emerald-500"/> Accounting</li>
+                <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-emerald-500"/> Business Studies</li>
+                <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-emerald-500"/> Economics</li>
+                <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-emerald-500"/> Mathematical Literacy</li>
+            </ul>
+          </motion.div>
+
+          {/* Languages Pillar */}
+          <motion.div whileHover={{ y: -10 }} className="p-8 bg-white rounded-[2.5rem] shadow-xl border-t-8 border-rose-500">
+            <div className="bg-rose-50 w-14 h-14 rounded-2xl flex items-center justify-center text-rose-600 mb-6">
+              <Languages size={28} />
+            </div>
+            <h3 className="text-xl font-black text-[#002b5c] mb-4">Languages</h3>
+            <ul className="space-y-3 text-sm text-slate-500 font-bold">
+                <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-rose-500"/> English HL/FAL</li>
+                <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-rose-500"/> Afrikaans FAL</li>
+                <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-rose-500"/> IsiXhosa HL/FAL</li>
+            </ul>
+          </motion.div>
+
+          {/* Humanities Pillar */}
+          <motion.div whileHover={{ y: -10 }} className="p-8 bg-white rounded-[2.5rem] shadow-xl border-t-8 border-yellow-500">
+            <div className="bg-yellow-50 w-14 h-14 rounded-2xl flex items-center justify-center text-yellow-600 mb-6">
+              <BookOpen size={28} />
+            </div>
+            <h3 className="text-xl font-black text-[#002b5c] mb-4">Humanities</h3>
+            <ul className="space-y-3 text-sm text-slate-500 font-bold">
+                <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-yellow-500"/> History</li>
+                <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-yellow-500"/> Geography</li>
+                <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-yellow-500"/> Life Orientation</li>
+            </ul>
+          </motion.div>
         </div>
 
-        {/* High School (Lower Secondary + IGCSE + A Levels) */}
-        <div className="space-y-12">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900 italic">
-              British Curriculum Secondary & IGCSE Streams
-            </h2>
-            <p className="text-gray-500 mt-2">
-              Preparing students for top South African and international universities.
+        {/* Career Pathways Info Diagram */}
+        <div className="bg-white rounded-[3rem] p-8 md:p-12 shadow-xl border border-blue-50 text-center space-y-8">
+            <h3 className="text-2xl font-black text-[#002b5c]">Strategic University Pathways</h3>
+            <p className="text-slate-500 text-sm max-w-2xl mx-auto">
+                We help you select subject combinations that maximize your APS (Admission Point Score) 
+                for specific career fields.
             </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             
-            {/* Science Stream */}
-            <motion.div whileHover={{ y: -10 }} className="p-8 bg-white rounded-3xl shadow-xl border-t-8 border-blue-500">
-              <Atom size={40} className="text-blue-500 mb-6" />
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">
-                Science & Technology
-              </h3>
-              <ul className="space-y-3 text-sm text-gray-600">
-                <li>• Mathematics</li>
-                <li>• Additional Mathematics</li>
-                <li>• Physics</li>
-                <li>• Chemistry</li>
-                <li>• Biology</li>
-                <li>• Coding</li>
-              </ul>
-              <div className="mt-6 pt-4 border-t text-[10px] font-bold tracking-widest text-gray-400">
-                Medicine · Engineering · Technology
-              </div>
-            </motion.div>
-
-            {/* Humanities */}
-            <motion.div whileHover={{ y: -10 }} className="p-8 bg-white rounded-3xl shadow-xl border-t-8 border-pink-500">
-              <Palette size={40} className="text-pink-500 mb-6" />
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">
-                Humanities & Arts
-              </h3>
-              <ul className="space-y-3 text-sm text-gray-600">
-                <li>• English Language</li>
-                <li>• English Literature</li>
-            
-              </ul>
-              <div className="mt-6 pt-4 border-t text-[10px] font-bold tracking-widest text-gray-400">
-                Law · Media · Education · International Studies
-              </div>
-            </motion.div>
-
-            {/* Commerce */}
-            <motion.div whileHover={{ y: -10 }} className="p-8 bg-white rounded-3xl shadow-xl border-t-8 border-yellow-500">
-              <TrendingUp size={40} className="text-yellow-600 mb-6" />
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">
-                Commerce & Economics
-              </h3>
-              <ul className="space-y-3 text-sm text-gray-600">
-                <li>• Economics</li>
-                <li>• Business Studies</li>
-                <li>• Accounting</li>
-                <li>• Enterprise</li>
-                <li>• Mathematics</li>
-              </ul>
-              <div className="mt-6 pt-4 border-t text-[10px] font-bold tracking-widest text-gray-400">
-                Finance · Entrepreneurship · Management
-              </div>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* Hybrid Note */}
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-700 rounded-[3rem] p-10 text-white flex items-center gap-8 shadow-2xl">
-          <Globe size={60} className="text-yellow-300 animate-pulse" />
-          <div>
-            <h3 className="text-2xl font-bold">British Curriculum Hybrid Learning</h3>
-            <p className="text-indigo-100 max-w-2xl">
-              All British Curriculum subjects are available on-campus or online through
-              live interactive lessons and a structured LMS.
-            </p>
-          </div>
         </div>
 
         {/* Final CTA */}
-        <div className="text-center py-1 space-y-6">
-          <h2 className="text-3xl font-black text-gray-900 ">
-            Begin Your British Curriculum Journey
-          </h2>
+        <div className="text-center py-8 space-y-8">
+          <div className="inline-block p-1 bg-gradient-to-r from-blue-400 via-blue-600 to-indigo-800 rounded-3xl shadow-2xl">
+            <Link
+              to="/login"
+              className="block bg-white text-[#002b5c] font-black text-xl md:text-2xl px-12 py-6 rounded-[1.4rem] hover:bg-transparent hover:text-white transition-all duration-300"
+            >
+              Secure Your 2026 Spot <Award className="inline ml-2" />
+            </Link>
           </div>
-          
-          <div className="flex justify-center">
-          <Link
-            to="/login"
-            className="bg-indigo-600 text-green-500 font-black text-xl px-12 py-5 rounded-2xl shadow-xl hover:bg-indigo-700"
-          >
-            Enrol Now <Award className="inline ml-2" />
-          </Link>
-          </div>
+          <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.4em]">
+            Classes Start 21 January 2026 • Limited Physical Seats Available
+          </p>
+        </div>
 
-        {/* Back */}
+        {/* Back Navigation */}
         <div className="text-center">
-          <Link to="/about" className="text-gray-400 font-bold hover:text-indigo-600 underline">
+          <Link
+            to="/about"
+            className="text-slate-400 font-bold hover:text-[#002b5c] transition-all underline decoration-2 underline-offset-8"
+          >
             ← Back to About Us
           </Link>
         </div>
-
       </div>
     </div>
   );

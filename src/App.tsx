@@ -9,31 +9,31 @@ import { TooltipProvider } from "./components/ui/tooltip";
 import { Toaster } from "./components/ui/toaster";
 import { Toaster as Sonner } from "./components/ui/sonner";
 
-import { AuthProvider } from "@/components/auth/AuthProvider";
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { AuthProvider } from "./components/auth/AuthProvider";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 
 // Auth Pages
-import LoginForm from "@/components/auth/LoginForm";
-import AdminLoginForm from "@/components/auth/AdminLoginForm";
-import SuspendedScreen from "@/components/auth/SuspendedScreen";
-import TeacherApplicationForm from "@/components/auth/TeacherApplicationForm";
+import LoginForm from "./components/auth/LoginForm";
+import AdminLoginForm from "./components/auth/AdminLoginForm";
+import SuspendedScreen from "./components/auth/SuspendedScreen";
+import TeacherApplicationForm from "./components/auth/TeacherApplicationForm";
 
-// Dashboards
-import AdminDashboard from "@/components/dashboards/AdminDashboard";
-import TeacherDashboard from "@/components/dashboards/TeacherDashboard";
-import StudentDashboard from "@/components/dashboards/StudentDashboard";
-import ParentDashboard from "@/components/dashboards/parent/ParentDashboard";
-import PrincipalDashboard from "@/components/dashboards/PrincipalDashboard";
+// Dashboard
+import AdminDashboard from "./components/dashboards/AdminDashboard";
+import TeacherDashboard from "./components/dashboards/TeacherDashboard";
+import StudentDashboard from "./components/dashboards/StudentDashboard";
+import ParentDashboard from "./components/dashboards/parent/ParentDashboard";
+import PrincipalDashboard from "./components/dashboards/PrincipalDashboard";
 
 // Parent Sections
-import PaymentsSection from "@/components/dashboards/parent/sections/PaymentSection";
-import StatusSection from "@/components/dashboards/parent/sections/StatusSection";
+import PaymentsSection from "./components/dashboards/parent/sections/PaymentSection";
+import StatusSection from "./components/dashboards/parent/sections/StatusSection";
 import ParentDashboardLayout from "./components/ParentDashboardLayout";
 
 // Public Pages
-import AboutUs from "@/components/AboutUs";
-import NotFound from "@/pages/NotFound";
-import AppLayout from "@/components/AppLayout";
+import AboutUs from "./components/AboutUs";
+import NotFound from "./pages/NotFound";
+import AppLayout from "./components/AppLayout";
 
 // Marketing Pages
 import WhyChoose from "./components/about/WhyChoose";

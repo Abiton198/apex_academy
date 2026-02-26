@@ -90,6 +90,32 @@ const AppContent: React.FC = () => {
             Offering full-time and part-time extra classes since 2017.
           </p>
 
+          {/* -------------------- ACTION BUTTONS -------------------- */}
+<div className="flex flex-col sm:flex-row gap-4 mb-12">
+  {/* Primary Portal Access */}
+  <motion.button
+    whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(59, 130, 246, 0.4)" }}
+    whileTap={{ scale: 0.95 }}
+    onClick={() => setShowLoginModal(true)}
+    className="bg-white text-[#002b5c] font-black py-4 px-10 rounded-2xl shadow-xl flex items-center justify-center gap-2 group transition-all"
+  >
+    Access Academy Portal 
+    <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+  </motion.button>
+
+  {/* NEW: Explore Academy / About Page Link */}
+  <Link to="/about">
+    <motion.button
+      whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.15)" }}
+      whileTap={{ scale: 0.95 }}
+      className="w-full sm:w-auto bg-white/10 backdrop-blur-md border border-white/20 text-white font-bold py-4 px-10 rounded-2xl flex items-center justify-center gap-2 transition-all"
+    >
+      <Info size={20} className="text-blue-300" /> 
+      Explore Our Academy
+    </motion.button>
+  </Link>
+</div>
+
           {/* Core Service Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl w-full mb-16">
             {[
