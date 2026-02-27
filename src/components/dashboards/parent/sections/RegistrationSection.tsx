@@ -46,8 +46,6 @@ interface Student {
 
 // Updated Grades to include South African Phases and the specific Rewrite focus
 const GRADES = [
-  "Grade 10 (FET Phase)", 
-  "Grade 11 (FET Phase)", 
   "Grade 12 (NSC)", 
   "Matric Rewrite (Upgrade)", 
   "Technical Matric"
@@ -90,7 +88,9 @@ const SOUTH_AFRICAN_REWRITE_SUBJECTS = {
   Advanced_Programmes: [
     "AP Mathematics (IEB)",
     "AP English (IEB)",
-    "AP Physics"
+    "AP Physics",
+    "Coding and Programming",
+    "Computer Studies"
   ]
 };
 
