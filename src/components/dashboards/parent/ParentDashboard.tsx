@@ -59,7 +59,7 @@ import PendingInvoiceModal from "./PendingInvoiceModal";
 /* ======================================================
    CONSTANTS & TYPES
 ====================================================== */
-const SCHOOL_NAME = "Care Academy";
+const SCHOOL_NAME = "MUC College";
 
 interface Student {
   // 🔑 Identity

@@ -63,7 +63,7 @@ const Enrolment: React.FC = () => {
             <div className="flex flex-col md:flex-row gap-4 md:items-center text-blue-100/80">
                 <div className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-xl border border-white/10">
                     <Calendar size={18} className="text-blue-400" />
-                    <span className="text-sm font-bold">Starts: 21 Jan 2026</span>
+                    <span className="text-sm font-bold">Starts: 21 Feb 2026</span>
                 </div>
                 <div className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-xl border border-white/10">
                     <ClipboardCheck size={18} className="text-blue-400" />
@@ -80,7 +80,7 @@ const Enrolment: React.FC = () => {
           </h1>
           <p className="text-slate-600 max-w-2xl mx-auto text-sm md:text-base">
             Choose Gqeberha's leading matric rewrite centre. Whether you prefer the structure of a campus 
-            or the flexibility of home, Apex Academic College delivers excellence.
+            or the flexibility of home, MUC College delivers excellence.
           </p>
         </div>
 
@@ -95,7 +95,7 @@ const Enrolment: React.FC = () => {
             </div>
             <h3 className="mt-6 text-2xl font-black text-[#002b5c]">Gqeberha Campus</h3>
             <p className="mt-3 text-slate-500 text-sm leading-relaxed">
-              Face-to-Face classes at our Glendinningvale premises. Expert-led sessions in a focused environment.
+              Face-to-Face classes at our Kempston premises. Expert-led sessions in a focused environment.
             </p>
           </motion.div>
 
@@ -137,7 +137,7 @@ const Enrolment: React.FC = () => {
           <div className="bg-white rounded-[1.9rem] p-6 md:p-8 text-center">
             <p className="text-base md:text-lg font-bold text-[#002b5c] flex flex-col md:flex-row items-center justify-center gap-3">
               <Zap className="text-yellow-500 fill-yellow-500" />
-              <span><strong>Apex Flexibility:</strong> You can transition between Online and Campus learning at any point!</span>
+              <span><strong>MUC Flexibility:</strong> You can transition between Online and Campus learning at any point!</span>
             </p>
           </div>
         </div>

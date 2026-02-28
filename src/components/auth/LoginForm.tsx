@@ -80,42 +80,54 @@ useEffect(() => {
       return;
     }
 
-    // prevent double-execution if we are already showing the modal
-    if (showTeacherModal || redirectedRef.current) return;
+    if (redirectedRef.current) return;
 
-    const userRef = doc(db, "users", user.uid);
-    
     try {
+      const userRef = doc(db, "users", user.uid);
       const snap = await getDoc(userRef);
 
-      if (snap.exists()) {
-        const data = snap.data();
-        // ... Normal Redirect Logic ...
-      } else {
-        // NEW USER PATH
-        if (selectedRole === "teacher" || tab === "signup") {
-           // STOP: Don't sign out. Don't redirect. Just show modal.
-           setNewTeacherUid(user.uid);
-           setShowTeacherModal(true);
-           setLoading(false);
-        } else {
-           // If they aren't a teacher and have no profile, then they are lost
-           setError("Profile not found.");
-           setLoading(false);
-        }
+      if (!snap.exists()) {
+        setError("Profile not found.");
+        setLoading(false);
+        return;
       }
-    } catch (err: any) {
-      // If it's a permission error, it's almost certainly a new user
-      if (err.code === "permission-denied" && selectedRole === "teacher") {
+
+      const data = snap.data();
+
+      // ✅ THIS IS THE FIX
+      if (data.role === "teacher" && data.applicationStatus === "pending") {
         setNewTeacherUid(user.uid);
         setShowTeacherModal(true);
         setLoading(false);
+        return;
       }
+
+      // normal redirects
+      if (data.role === "teacher") {
+        redirectedRef.current = true;
+        navigate("/teacher-dashboard");
+      }
+
+      if (data.role === "parent") {
+        redirectedRef.current = true;
+        navigate("/parent-dashboard");
+      }
+
+      if (data.role === "principal") {
+        redirectedRef.current = true;
+        navigate("/principal-dashboard");
+      }
+
+      setLoading(false);
+
+    } catch (err) {
+      console.error(err);
+      setLoading(false);
     }
   });
 
   return () => unsub();
-}, [tab, selectedRole, showTeacherModal]); // Watch showTeacherModal to prevent loops
+}, []);
 
   /* =====================================================
      GOOGLE AUTH (SIGN IN & REGISTER)
@@ -170,10 +182,11 @@ const handleGoogle = async () => {
     // 4. Immediate Teacher Modal Trigger
     // This bypasses the useEffect delay for a smoother registration UX
     if (finalRole === "teacher") {
-      setNewTeacherUid(user.uid);
-      setShowTeacherModal(true);
-      setAuthLoading(false); // Stop loading so they can see the modal
-    }
+  setNewTeacherUid(user.uid);
+  setShowTeacherModal(true);
+}
+
+setAuthLoading(false);
 
   } catch (err: any) {
     console.error("Google Auth Error:", err);
@@ -279,34 +292,80 @@ const handleStudentLogin = async () => {
 
   return (
     <>
-      <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-blue-50 p-4">
-        <Card className="w-full max-w-md rounded-3xl shadow-xl overflow-hidden">
-          <CardHeader className="relative bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-center py-8">
-            <button
-              type="button"
-              onClick={() => (window.location.href = "/")}
-              className="absolute top-4 right-4 rounded-full bg-white/20 p-2 hover:bg-white/40 transition"
-            >
-              <X size={20} />
-            </button>
-            <CardTitle className="text-3xl font-bold">APEX Academy</CardTitle>
-            <CardDescription className="text-indigo-100">Portal Access</CardDescription>
-          </CardHeader>
+     <div className="
+  relative 
+  min-h-screen 
+  bg-gradient-to-br from-indigo-50 to-blue-50
+  flex 
+  items-start 
+  justify-center 
+  p-4 
+  overflow-y-auto
+">
 
-          <CardContent className="p-8 space-y-6">
-            {error && (
-              <Alert variant="destructive" className="rounded-xl">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
+  <Card className="
+    w-full 
+    max-w-md 
+    rounded-3xl 
+    shadow-xl 
+    my-6
+    max-h-[95vh]
+    flex 
+    flex-col
+  ">
 
-            <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>
-              <TabsList className="grid grid-cols-3 bg-indigo-50 rounded-xl p-1">
-                <TabsTrigger value="signin">Sign In</TabsTrigger>
-                <TabsTrigger value="student">Student</TabsTrigger>
-                <TabsTrigger value="signup">Register</TabsTrigger>
-              </TabsList>
+    {/* FIXED HEADER */}
+    <CardHeader className="
+      relative 
+      bg-gradient-to-r from-indigo-600 to-purple-600 
+      text-white 
+      text-center 
+      py-6
+      flex-shrink-0
+    ">
+      <button
+        type="button"
+        onClick={() => (window.location.href = "/")}
+        className="absolute top-4 right-4 rounded-full bg-white/20 p-2 hover:bg-white/40 transition"
+      >
+        <X size={20} />
+      </button>
+
+      <CardTitle className="text-3xl font-bold">
+        APEX Academy
+      </CardTitle>
+
+      <CardDescription className="text-indigo-100">
+        Portal Access
+      </CardDescription>
+
+    </CardHeader>
+
+
+    {/* SCROLLABLE CONTENT */}
+    <CardContent className="
+      p-6
+      space-y-6
+      overflow-y-auto
+      scrollbar-thin
+      scrollbar-thumb-indigo-300
+      scrollbar-track-transparent
+    ">
+
+      {error && (
+        <Alert variant="destructive" className="rounded-xl">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>
+
+        <TabsList className="grid grid-cols-3 bg-indigo-50 rounded-xl p-1">
+          <TabsTrigger value="signin">Sign In</TabsTrigger>
+          <TabsTrigger value="student">Student</TabsTrigger>
+          <TabsTrigger value="signup">Register</TabsTrigger>
+        </TabsList>
 
               {/* STAFF/PARENT SIGN IN */}
               <TabsContent value="signin" className="space-y-4 mt-6">
@@ -384,21 +443,37 @@ const handleStudentLogin = async () => {
               </TabsContent>
             </Tabs>
 
-            <div className="relative py-2">
-              <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
-              <div className="relative flex justify-center text-[10px] uppercase"><span className="bg-white px-2 text-slate-400">Social Login</span></div>
-            </div>
-
-            <Button variant="outline" className="w-full rounded-xl h-12" onClick={handleGoogle} disabled={authLoading}>
-              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="mr-3 h-4 w-4" alt="G" />
-              Google Sign In
-            </Button>
-          </CardContent>
-        </Card>
-
-    
-
+             {/* SOCIAL LOGIN */}
+      <div className="relative py-2">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t" />
+        </div>
+        <div className="relative flex justify-center text-[10px] uppercase">
+          <span className="bg-white px-2 text-slate-400">
+            Social Login
+          </span>
+        </div>
       </div>
+
+      <Button
+        variant="outline"
+        className="w-full rounded-xl h-12"
+        onClick={handleGoogle}
+        disabled={authLoading}
+      >
+        <img
+          src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+          className="mr-3 h-4 w-4"
+          alt="G"
+        />
+        Google Sign In
+      </Button>
+
+    </CardContent>
+
+  </Card>
+
+</div>
 
            {showTeacherModal && (
       <TeacherApplicationModal 

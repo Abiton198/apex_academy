@@ -19,7 +19,7 @@ import {
 } from "firebase/firestore";
 import { getAuth, onAuthStateChanged, signOut, User } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import MoodleCard from "./MoodleCard";
+// import MoodleCard from "./MoodleCard";
 
 /* UI Components */
 import { Button } from "@/components/ui/button";
@@ -1109,7 +1109,7 @@ const sortedTimetable = [...timetable].sort((a, b) => {
             </Card>
           </TabsContent>
 
-          <MoodleCard/>
+          {/* <MoodleCard/> */}
 
           {/* LINK ENGINE TAB */}
          <TabsContent value="links">

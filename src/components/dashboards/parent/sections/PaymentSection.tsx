@@ -164,7 +164,7 @@ export default function PaymentsSection() {
     }
   };
 
-  if (loading) return <div className="p-20 text-center font-bold text-indigo-600">Loading Financial Records...</div>;
+  if (loading) return <div className="p-20 text-center font-bold text-indigo-600">Loading Financial Records...</div>
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto p-4 animate-in fade-in">
