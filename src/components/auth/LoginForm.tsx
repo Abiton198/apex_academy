@@ -75,46 +75,55 @@ export default function LoginForm() {
    ===================================================== */
 useEffect(() => {
   const unsub = onAuthStateChanged(auth, async (user) => {
+
+    console.log("AUTH STATE CHANGED:", user?.uid);
+
     if (!user) {
       setLoading(false);
       return;
     }
 
-    if (redirectedRef.current) return;
-
     try {
-      const userRef = doc(db, "users", user.uid);
-      const snap = await getDoc(userRef);
+
+      const ref = doc(db, "users", user.uid);
+      const snap = await getDoc(ref);
+
+      console.log("USER DOC EXISTS:", snap.exists());
 
       if (!snap.exists()) {
-        setError("Profile not found.");
         setLoading(false);
         return;
       }
 
       const data = snap.data();
 
-      // ✅ THIS IS THE FIX
+      console.log("USER DATA:", data);
+
+      // ✅ FORCE MODAL OPEN
       if (data.role === "teacher" && data.applicationStatus === "pending") {
+
+        console.log("OPENING TEACHER MODAL");
+
         setNewTeacherUid(user.uid);
-        setShowTeacherModal(true);
+
+        // IMPORTANT: use functional update to guarantee render
+        setShowTeacherModal(() => true);
+
         setLoading(false);
+
         return;
       }
 
-      // normal redirects
+      // redirects
       if (data.role === "teacher") {
-        redirectedRef.current = true;
         navigate("/teacher-dashboard");
       }
 
       if (data.role === "parent") {
-        redirectedRef.current = true;
         navigate("/parent-dashboard");
       }
 
       if (data.role === "principal") {
-        redirectedRef.current = true;
         navigate("/principal-dashboard");
       }
 
@@ -124,9 +133,11 @@ useEffect(() => {
       console.error(err);
       setLoading(false);
     }
+
   });
 
   return () => unsub();
+
 }, []);
 
   /* =====================================================
@@ -153,17 +164,18 @@ const handleGoogle = async () => {
     const snap = await getDoc(ref);
 
     // 2. Existing User Check
-    if (snap.exists()) {
-      const data = snap.data();
-      console.log("Existing user found. Role:", data.role);
-      
-      // Special check: If an existing teacher hasn't finished their application
-      if (data.role === "teacher" && data.applicationStatus === "pending") {
-        setNewTeacherUid(user.uid);
-        setShowTeacherModal(true);
-      }
-      return; 
-    }
+ if (snap.exists()) {
+  const data = snap.data();
+
+  if (data.role === "teacher" && data.applicationStatus === "pending") {
+    setNewTeacherUid(user.uid);
+    setShowTeacherModal(true);
+    setLoading(false); // ← ADD THIS
+  }
+
+  setAuthLoading(false); // ← ADD THIS
+  return;
+}
 
     // 3. New User Creation
     // Default to 'parent' if they used the Sign In tab for a first-time login
@@ -184,6 +196,7 @@ const handleGoogle = async () => {
     if (finalRole === "teacher") {
   setNewTeacherUid(user.uid);
   setShowTeacherModal(true);
+  setLoading(false);
 }
 
 setAuthLoading(false);
@@ -288,7 +301,13 @@ const handleStudentLogin = async () => {
     }
   };
 
-  if (loading) return null;
+if (loading) {
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <Loader2 className="animate-spin" />
+    </div>
+  );
+}
 
   return (
     <>
@@ -475,17 +494,16 @@ const handleStudentLogin = async () => {
 
 </div>
 
-           {showTeacherModal && (
-      <TeacherApplicationModal 
-        open={showTeacherModal}
-        userId={newTeacherUid}
-        applicationId={newTeacherUid}
-        onClose={() => setShowTeacherModal(false)}
-        onSubmitted={() => {
-          setShowTeacherModal(false);
-          window.location.href = "/teacher-dashboard";
-        }}
-        />)}
+         <TeacherApplicationModal 
+  open={showTeacherModal}
+  userId={newTeacherUid}
+  applicationId={newTeacherUid}
+  onClose={() => setShowTeacherModal(false)}
+  onSubmitted={() => {
+    setShowTeacherModal(false);
+    window.location.href = "/teacher-dashboard";
+  }}
+/>
     </>
   );
 }
