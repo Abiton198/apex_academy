@@ -73,6 +73,8 @@ export default function LoginForm() {
  /* =====================================================
    AUTH STATE LISTENER (FIXED PERMISSION GUARD)
    ===================================================== */
+
+   console.log("MODAL STATE:", showTeacherModal, newTeacherUid);
 useEffect(() => {
   const unsub = onAuthStateChanged(auth, async (user) => {
 
@@ -311,37 +313,42 @@ if (loading) {
 
   return (
     <>
-     <div className="
-  relative 
-  min-h-screen 
+     <div
+  className="
+  min-h-screen
   bg-gradient-to-br from-indigo-50 to-blue-50
-  flex 
-  items-start 
-  justify-center 
-  p-4 
-  overflow-y-auto
-">
+  flex
+  justify-center
+  items-start
+  p-4
+"
+>
 
-  <Card className="
-    w-full 
-    max-w-md 
-    rounded-3xl 
-    shadow-xl 
+  <Card
+    className="
+    w-full
+    max-w-md
+    rounded-3xl
+    shadow-xl
     my-6
-    max-h-[95vh]
-    flex 
+    flex
     flex-col
-  ">
+  "
+  >
 
-    {/* FIXED HEADER */}
-    <CardHeader className="
-      relative 
-      bg-gradient-to-r from-indigo-600 to-purple-600 
-      text-white 
-      text-center 
+    {/* HEADER */}
+    <CardHeader
+      className="
+      relative
+      bg-gradient-to-r
+      from-indigo-600
+      to-purple-600
+      text-white
+      text-center
       py-6
-      flex-shrink-0
-    ">
+    "
+    >
+
       <button
         type="button"
         onClick={() => (window.location.href = "/")}
@@ -360,16 +367,8 @@ if (loading) {
 
     </CardHeader>
 
-
-    {/* SCROLLABLE CONTENT */}
-    <CardContent className="
-      p-6
-      space-y-6
-      overflow-y-auto
-      scrollbar-thin
-      scrollbar-thumb-indigo-300
-      scrollbar-track-transparent
-    ">
+    {/* CONTENT */}
+    <CardContent className="p-6 space-y-6">
 
       {error && (
         <Alert variant="destructive" className="rounded-xl">
@@ -378,6 +377,7 @@ if (loading) {
         </Alert>
       )}
 
+      {/* TABS */}
       <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>
 
         <TabsList className="grid grid-cols-3 bg-indigo-50 rounded-xl p-1">
@@ -386,97 +386,157 @@ if (loading) {
           <TabsTrigger value="signup">Register</TabsTrigger>
         </TabsList>
 
-              {/* STAFF/PARENT SIGN IN */}
-              <TabsContent value="signin" className="space-y-4 mt-6">
-                <div className="space-y-2">
-                  <Label>Email</Label>
-                  <Input
-                    type="email"
-                    placeholder="name@school.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2 relative">
-                  <Label>Password</Label>
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-9 text-slate-400"
-                  >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-                <Button className="w-full" disabled={authLoading} onClick={handleEmailPasswordSignIn}>
-                  {authLoading ? <Loader2 className="animate-spin" /> : "Sign In"}
-                </Button>
-              </TabsContent>
+        {/* SIGN IN */}
+        <TabsContent value="signin" className="space-y-4 mt-6">
 
-              {/* STUDENT LOGIN */}
-              <TabsContent value="student" className="space-y-4 mt-6">
-                <div className="space-y-2">
-                  <Label>Username</Label>
-                  <Input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="firstname.lastname" />
-                </div>
-                <div className="space-y-2 relative">
-                  <Label>Password</Label>
-                  <Input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-9 text-slate-400">
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-                <Button className="w-full bg-indigo-600" disabled={studentAuthLoading} onClick={handleStudentLogin}>
-                  {studentAuthLoading ? <Loader2 className="animate-spin" /> : "Access Portal"}
-                </Button>
-              </TabsContent>
+          <div className="space-y-2">
+            <Label>Email</Label>
+            <Input
+              type="email"
+              placeholder="name@school.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
 
-              {/* REGISTER (GOOGLE ONLY) */}
-              <TabsContent value="signup" className="space-y-4 mt-6">
-                <div className="p-4 bg-indigo-50 rounded-2xl border border-indigo-100 space-y-3">
-                  <Label className="text-[10px] font-black uppercase text-indigo-600">Select Your Role</Label>
-                  <Select value={selectedRole} onValueChange={setSelectedRole}>
-                    <SelectTrigger className="rounded-xl border-none">
-                      <SelectValue placeholder="I am a..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {ROLES.map((r) => (
-                        <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Button
-                  variant="outline"
-                  className="w-full h-12 rounded-xl border-2 border-indigo-600 text-indigo-600 font-bold"
-                  onClick={handleGoogle}
-                  disabled={!selectedRole || authLoading}
-                >
-                  {authLoading ? <Loader2 className="animate-spin" /> : <Chrome className="mr-2" size={18} />}
-                  Register with Google
-                </Button>
-              </TabsContent>
-            </Tabs>
+          <div className="space-y-2 relative">
+            <Label>Password</Label>
 
-             {/* SOCIAL LOGIN */}
+            <Input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-9 text-slate-400"
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+
+          <Button
+            className="w-full"
+            disabled={authLoading}
+            onClick={handleEmailPasswordSignIn}
+          >
+            {authLoading ? <Loader2 className="animate-spin" /> : "Sign In"}
+          </Button>
+
+        </TabsContent>
+
+        {/* STUDENT */}
+        <TabsContent value="student" className="space-y-4 mt-6">
+
+          <div className="space-y-2">
+            <Label>Username</Label>
+            <Input
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="firstname.lastname"
+            />
+          </div>
+
+          <div className="space-y-2 relative">
+            <Label>Password</Label>
+
+            <Input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-9 text-slate-400"
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+
+          <Button
+            className="w-full bg-indigo-600"
+            disabled={studentAuthLoading}
+            onClick={handleStudentLogin}
+          >
+            {studentAuthLoading ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              "Access Portal"
+            )}
+          </Button>
+
+        </TabsContent>
+
+        {/* REGISTER */}
+        <TabsContent value="signup" className="space-y-4 mt-6">
+
+          <div className="p-4 bg-indigo-50 rounded-2xl border border-indigo-100 space-y-3">
+
+            <Label className="text-[10px] font-black uppercase text-indigo-600">
+              Select Your Role
+            </Label>
+
+            <Select
+              value={selectedRole}
+              onValueChange={setSelectedRole}
+            >
+              <SelectTrigger className="rounded-xl border-none">
+                <SelectValue placeholder="I am a..." />
+              </SelectTrigger>
+
+              <SelectContent>
+                {ROLES.map((r) => (
+                  <SelectItem key={r.value} value={r.value}>
+                    {r.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+
+            </Select>
+
+          </div>
+
+          <Button
+            variant="outline"
+            className="w-full h-12 rounded-xl border-2 border-indigo-600 text-indigo-600 font-bold"
+            onClick={handleGoogle}
+            disabled={!selectedRole || authLoading}
+          >
+            {authLoading ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              <Chrome className="mr-2" size={18} />
+            )}
+
+            Register with Google
+          </Button>
+
+        </TabsContent>
+
+      </Tabs>
+
+      {/* SOCIAL LOGIN */}
       <div className="relative py-2">
+
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
         </div>
+
         <div className="relative flex justify-center text-[10px] uppercase">
           <span className="bg-white px-2 text-slate-400">
             Social Login
           </span>
         </div>
+
       </div>
 
       <Button
         variant="outline"
-        className="w-full rounded-xl h-12"
+        className="w-full rounded-xl h-12 mb-80"
         onClick={handleGoogle}
         disabled={authLoading}
       >
@@ -485,6 +545,7 @@ if (loading) {
           className="mr-3 h-4 w-4"
           alt="G"
         />
+
         Google Sign In
       </Button>
 
